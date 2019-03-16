@@ -3,7 +3,9 @@
     "version":"0.1",
     "manifest_version": 2,
     "description":"A extention from boilerplate",
-    "options_page": "options.html",
+    "options_ui": {
+      "page":"options.html"
+    },
     "icons":{
         "48":"icons/webext-48.png"
     },
