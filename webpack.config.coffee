@@ -1,18 +1,16 @@
 path = require 'path'
 webpack = require 'webpack'
+webExtPlugin = require 'webpack-webextension-plugin'
+CleanWebpackPlugin = require "clean-webpack-plugin"
+WriteFilePlugin = require "write-file-webpack-plugin"
+CopyWebpackPlugin = require "copy-webpack-plugin"
 
 HtmlWebpackPlugin = require 'html-webpack-plugin'
 ExtractTextPlugin = require 'extract-text-webpack-plugin'
 
+fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "woff", "woff2"]
+
 isProduction = process.env.NODE_ENV is 'production'
-
-cssDev = ['style-loader', 'css-loader']
-cssProd = ExtractTextPlugin.extract
-  fallback: 'style-loader'
-  use: ['css-loader']
-  publicPath: '/dist'
-
-cssConfig = if isProduction then cssProd else cssDev
 
 HtmlWebpackPluginConfig = new HtmlWebpackPlugin
   template: './src/index.html'
@@ -20,22 +18,15 @@ HtmlWebpackPluginConfig = new HtmlWebpackPlugin
   hash: true
 
 module.exports =
-  entry: './src/index.coffee'
+  mode: process.env.NODE_ENV || "development",
+  entry:
+    popup: path.join(__dirname, "src", "popup", "popup.coffee"),
+    options: path.join(__dirname, "src", "options", "options.coffee"),
+    background: path.join(__dirname, "src", "background", "background.coffee")
+    content: path.join(__dirname, "src", "content", "content.coffee")
   output:
-    filename: 'index.bundle.js'
-    path: path.resolve(__dirname, 'dist')
-    publicPath: '/'
-  devServer:
-    contentBase: path.join(__dirname, 'dist'),
-    compress: true
-    hot: true
-    open: true
-    host: '0.0.0.0'
-    historyApiFallback: true,
-    headers:
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "content-type, Authorization, x-id, Content-Length, X-Requested-With",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS"
+    path: path.join(__dirname, "build"),
+    filename: "[name].bundle.js"
   module:
     rules: [
       {
@@ -59,19 +50,41 @@ module.exports =
         }, {
           loader: 'less-loader',
         }],
+        exclude: /node_modules/
       },
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
+        exclude: /node_modules/
+      },
+      {
+        test: new RegExp('\.(' + fileExtensions.join('|') + ')$'),
+        loader: "file-loader?name=[path][name].[ext]",
+        exclude: /node_modules/
       },
 
     ]
   plugins: [
-    HtmlWebpackPluginConfig
-    new ExtractTextPlugin
-      filename: 'app.css'
-      disable: !isProduction
-      allChunks: true
-    new webpack.HotModuleReplacementPlugin()
-    new webpack.NamedModulesPlugin()
+    new CleanWebpackPlugin(["build"]),
+    # The following lines insert a link to produced [module].bundle.js into a [module].html file
+    new CopyWebpackPlugin([
+      from: "src/manifest.json",
+    ]),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "src", "popup.html"),
+      filename: "popup.html",
+      chunks: ["popup"]
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "src", "options.html"),
+      filename: "options.html",
+      chunks: ["options"]
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "src", "background.html"),
+      filename: "background.html",
+      chunks: ["background"]
+    }),
+    new WriteFilePlugin()
   ]
+

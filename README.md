@@ -1,11 +1,25 @@
-# React + Coffeescript + Hot reload = <3
+# Web Extension + React + Coffeescript + Hot reload = <3
 
 libraries included:
 
  - coffeescript
  - less, css
  - react-router
- - axios
+
+Created using
+[WebExtensionToolbox](https://github.com/webextension-toolbox/webextension-toolbox)
+
+To install `npm install -g webextension-toolbox`
+```
+ webextension-toolbox dev --help
+ webextension-toolbox dev chrome
+ webextension-toolbox dev firefox
+ webextension-toolbox dev opera
+ webextension-toolbox dev edge
+```
+
+Browsers:
+    -  Firefox >48
 
 Also, webpack configured to serve for all ip, work with react-router and use CORS
 
