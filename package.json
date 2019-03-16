@@ -18,6 +18,8 @@
     "coffee": "^5.2.1",
     "copy-webpack-plugin": "^5.0.1",
     "file-loader": "^3.0.1",
+    "less": "^3.9.0",
+    "less-loader": "^4.1.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-dom-factories": "^1.0.2",
