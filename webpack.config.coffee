@@ -12,10 +12,6 @@ fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "woff
 
 isProduction = process.env.NODE_ENV is 'production'
 
-HtmlWebpackPluginConfig = new HtmlWebpackPlugin
-  template: './src/index.html'
-  filename: 'index.html'
-  hash: true
 
 module.exports =
   mode: process.env.NODE_ENV || "development",
@@ -42,19 +38,11 @@ module.exports =
         exclude: /node_modules/
       },
       {
-        test: /\.less$/,
-        use: [{
-          loader: 'style-loader' ,
-        }, {
-          loader: 'css-loader',
-        }, {
-          loader: 'less-loader',
-        }],
-        exclude: /node_modules/
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        test: /\.(css|less)$/,
+        loader: ExtractTextPlugin.extract
+          fallback: 'style-loader'
+          use: ['css-loader','less-loader']
+          publicPath: '/build'
         exclude: /node_modules/
       },
       {
@@ -66,6 +54,10 @@ module.exports =
     ]
   plugins: [
     new CleanWebpackPlugin(["build"]),
+    new ExtractTextPlugin(
+      filename: 'app.css'
+      allChunks: true
+    ),
     # The following lines insert a link to produced [module].bundle.js into a [module].html file
     new CopyWebpackPlugin([
       from: "src/manifest.json",
