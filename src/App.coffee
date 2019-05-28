@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import L from 'react-dom-factories'
 L_ = React.createElement
+import './App.less'
 
 Greeting = ()->
   L.div className:'greeting',
